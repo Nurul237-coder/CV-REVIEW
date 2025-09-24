@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Snapshot Analisis – CV Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body id="analysisPage">
+  <header class="header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-dot"></div>
+        CV Review
+      </div>
+      <div class="nav-actions">
+        <a href="index.html">Beranda</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container analysis-wrap">
+    <section class="card score-card">
+      <div class="score-circle" style="--score:65">
+        <div id="scoreValue" class="value">65<small>/100</small></div>
+      </div>
+      <div>
+        <div class="badge warn">Snapshot Gratis</div>
+        <h2 style="margin: 10px 0 4px; font-size: 22px;">Skor CV</h2>
+        <p style="margin: 0 0 8px; color:#6B7280;">Target: <strong id="roleLabel">General</strong></p>
+        <div class="highlights">
+          <div class="highlight-item"><div class="ico success">✔️</div> Format CV sudah rapi</div>
+          <div class="highlight-item"><div class="ico warn">⚠️</div> Kurang keyword sesuai role target</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Role-specific sub-scores -->
+    <section id="subScores" class="card sub-scores">
+      <h3 style="margin: 0 0 6px;">Sub-score per Kategori</h3>
+      <div class="bars">
+        <div class="bar">
+          <div class="meta"><span id="bar1Label">Kategori 1</span><span id="bar1Value">68/100</span></div>
+          <div class="track"><div id="bar1Fill" class="fill" style="width:68%"></div></div>
+        </div>
+        <div class="bar">
+          <div class="meta"><span id="bar2Label">Kategori 2</span><span id="bar2Value">64/100</span></div>
+          <div class="track"><div id="bar2Fill" class="fill" style="width:64%"></div></div>
+        </div>
+        <div class="bar">
+          <div class="meta"><span id="bar3Label">Kategori 3</span><span id="bar3Value">62/100</span></div>
+          <div class="track"><div id="bar3Fill" class="fill" style="width:62%"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bell-curve">
+      <svg class="curve-svg" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,35 C20,35 25,5 50,5 C75,5 80,35 100,35" fill="none" stroke="#2563EB" stroke-width="2" />
+      </svg>
+      <div id="curveDot" class="dot" style="left: 65%;"></div>
+      <div class="bell-legend"><span>Rendah</span><span>Tinggi</span></div>
+    </section>
+
+    <!-- Sprint 3: Auto-Rewrite Suggestions -->
+    <section class="card">
+      <div class="rewrite-header">
+        <h3 style="margin:0">Auto-Rewrite Suggestions</h3>
+        <span class="chip">Beta</span>
+      </div>
+      <div id="rewriteList" class="rewrite-list">
+        <!-- JS will render role-specific items. One free sample, others locked. -->
+      </div>
+    </section>
+
+    <!-- Sprint 3: Preview CV ATS-friendly (Tailored Draft) -->
+    <section id="previewCard" class="preview-card accent-green">
+      <div class="preview-head">
+        <h3 style="margin:0">Preview CV (Tailored Draft)</h3>
+        <p class="helper" style="margin:6px 0 0;">Ringkasan ATS-friendly. Beberapa bagian terkunci untuk teaser.</p>
+      </div>
+      <div class="preview-grid">
+        <div class="preview-section">
+          <h4>Summary / Objective</h4>
+          <p id="previewSummary">Contoh ringkas akan ditampilkan di sini.</p>
+        </div>
+        <div class="preview-section">
+          <h4>Experience / Projects</h4>
+          <ul id="previewProjects" style="margin:0; padding-left:18px;">
+            <li>Contoh proyek akan ditampilkan di sini.</li>
+          </ul>
+        </div>
+        <div class="preview-section">
+          <h4>Skills</h4>
+          <p id="previewSkills">Contoh skills akan ditampilkan di sini.</p>
+        </div>
+      </div>
+      <div class="preview-watermark"><span>Premium</span></div>
+      <div class="actions" style="margin-top: 12px;">
+        <button id="downloadBtn" class="btn btn-primary" disabled>Download ATS CV (Premium Only)</button>
+      </div>
+    </section>
+
+    <section class="premium-box">
+      <div class="title">Terkunci • Analisis Lengkap & Rewrite Premium</div>
+      <ul style="margin: 8px 0 0; padding-left: 18px; color:#374151;">
+        <li>Lihat semua auto-rewrite bullet & summary</li>
+        <li>Download CV ATS-friendly (DOCX/PDF)</li>
+        <li>Dapatkan rekomendasi perbaikan lengkap sesuai role</li>
+      </ul>
+      <div class="cta-premium" style="justify-content:flex-start;">
+        <button id="unlockBtn" class="btn btn-primary">Unlock Premium untuk Lihat Semua Rewrite</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© 2025 CV Review</div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  
+  <!-- Sprint 4: Lock Screen Modal -->
+  <div id="lockModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">🔒 Unlock Analisis Lengkap & CV Tailored</div>
+        <button id="closeLock" class="btn btn-outline">Tutup</button>
+      </div>
+      <ul class="modal-benefits">
+        <li>Full Gap Analysis per kategori</li>
+        <li>Auto-Rewrite lengkap (bullet & summary)</li>
+        <li>Download CV ATS-friendly (DOCX/PDF)</li>
+        <li>Persentil posisi di kurva nasional</li>
+      </ul>
+      <div class="actions" style="margin-top: 6px; gap: 8px;">
+        <button id="goToPayment" class="btn btn-primary">Unlock Premium Sekarang (Rp 25.000)</button>
+        <button id="stayFree" class="btn btn-outline">Lanjutkan Gratis (Snapshot Saja)</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

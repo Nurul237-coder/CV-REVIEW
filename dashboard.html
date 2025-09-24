@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard – Application Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body id="dashboardPage">
+  <header class="header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-dot"></div>
+        CV Review
+      </div>
+      <div class="nav-actions">
+        <a href="index.html">Beranda</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard container">
+    <section class="kanban">
+      <div class="columns">
+        <div class="column" id="col-draft">
+          <h4>Draft CV <span class="status-dot st-draft"></span></h4>
+          <div class="kanban-card" id="card-1">
+            <div><strong>Beasiswa ABC</strong></div>
+            <div class="meta"><span>Deadline: 2025-10-01</span><span class="deadline-badge">H-7</span></div>
+          </div>
+        </div>
+        <div class="column" id="col-submitted">
+          <h4>Submitted <span class="status-dot st-submitted"></span></h4>
+          <div class="kanban-card" id="card-2">
+            <div><strong>Magang XYZ</strong></div>
+            <div class="meta"><span>Deadline: 2025-09-30</span><span class="deadline-badge deadline-warning">H-3</span></div>
+          </div>
+        </div>
+        <div class="column" id="col-interview">
+          <h4>Interview <span class="status-dot st-interview"></span></h4>
+        </div>
+        <div class="column" id="col-accepted">
+          <h4>Accepted <span class="status-dot st-accepted"></span></h4>
+        </div>
+        <div class="column" id="col-rejected">
+          <h4>Rejected <span class="status-dot st-rejected"></span></h4>
+        </div>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <div class="widget">
+        <h4 style="margin:0 0 8px;">Upcoming Deadlines</h4>
+        <ul style="margin:0; padding-left: 18px;">
+          <li>Beasiswa ABC – H-7</li>
+          <li>Magang XYZ – H-3</li>
+        </ul>
+        <button id="unlockKanban" class="btn btn-primary" style="margin-top: 10px;">Perbaiki CV sebelum deadline</button>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© 2025 CV Review</div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

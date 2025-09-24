@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Role Form – CV Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body id="roleFormPage" class="role-accent">
+  <header class="header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-dot"></div>
+        CV Review
+      </div>
+      <div class="nav-actions">
+        <a href="index.html">Beranda</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 920px;">
+    <section class="card">
+      <div style="display:flex; justify-content: space-between; align-items: center; gap: 12px;">
+        <h1 style="font-size:24px; margin: 0; font-weight:800;">Form Spesifik Role</h1>
+        <div class="badge warn">Role: <span id="rolePicked" style="margin-left:6px; font-weight:800;">Scholarship</span></div>
+      </div>
+      <div class="tabs" style="margin-top: 12px;">
+        <button type="button" class="tab" data-role="Scholarship">🎓 Scholarship</button>
+        <button type="button" class="tab" data-role="Career Switcher">🔁 Career Switcher</button>
+        <button type="button" class="tab" data-role="Internship">👩‍💻 Internship</button>
+      </div>
+
+      <!-- Scholarship form -->
+      <div class="form-section" data-role="Scholarship">
+        <div class="form-grid">
+          <div class="field">
+            <label for="ipk">IPK (0.00–4.00)</label>
+            <input id="ipk" type="number" step="0.01" min="0" max="4" placeholder="contoh 3.75" />
+          </div>
+          <div class="field">
+            <label for="testScore">Test Score (IELTS 0–9 atau TOEFL 0–120)</label>
+            <input id="testScore" type="number" step="0.1" min="0" max="120" placeholder="IELTS 7.5 atau TOEFL 95" />
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="awards">Awards/Achievements</label>
+            <textarea id="awards" placeholder="Tuliskan penghargaan, kompetisi, riset, publikasi, dsb."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Career Switcher form -->
+      <div class="form-section" data-role="Career Switcher">
+        <div class="form-grid">
+          <div class="field">
+            <label for="roleFrom">Role Asal</label>
+            <select id="roleFrom">
+              <option value="">Pilih salah satu</option>
+              <option>Non-IT</option>
+              <option>Support</option>
+              <option>Finance/Accounting</option>
+              <option>Sales/Marketing</option>
+              <option>Operations</option>
+              <option>Design</option>
+              <option>QA/Testing</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="roleTo">Role Tujuan</label>
+            <select id="roleTo">
+              <option value="">Pilih salah satu</option>
+              <option>Software Engineer</option>
+              <option>Data Analyst</option>
+              <option>Product Manager</option>
+              <option>UI/UX Designer</option>
+              <option>Digital Marketer</option>
+              <option>Business Analyst</option>
+            </select>
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="skills">Transferable Skills</label>
+            <textarea id="skills" placeholder="Tulis skill yang relevan (contoh: analisis data, komunikasi, manajemen proyek, dsb.)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Internship form -->
+      <div class="form-section" data-role="Internship">
+        <div class="form-grid">
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="projects">Academic Projects</label>
+            <textarea id="projects" placeholder="Deskripsikan proyek kuliah/mandiri, teknologi, kontribusi, hasil."></textarea>
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="org">Organization/Volunteer Experience</label>
+            <textarea id="org" placeholder="Aktivitas organisasi, event, panitia, volunteer, peran dan dampak."></textarea>
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="coursework">Coursework Relevan</label>
+            <textarea id="coursework" placeholder="Mata kuliah terkait (contoh: Algoritma, Statistik, Desain Produk, dsb.)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top: 16px; justify-content: flex-end;">
+        <button id="toAnalysisBtn" class="btn btn-primary">Lanjut ke Snapshot Analysis →</button>
+      </div>
+      <p class="helper" style="margin:8px 0 0;">Catatan: Perhitungan ini simulasi untuk mockup (teaser). Versi Premium akan menampilkan detail lengkap per kategori.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© 2025 CV Review</div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

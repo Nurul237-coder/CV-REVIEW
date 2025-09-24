@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pembayaran – CV Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body id="paymentPage">
+  <header class="header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-dot"></div>
+        CV Review
+      </div>
+      <div class="nav-actions">
+        <a href="index.html">Beranda</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container payment-wrap">
+    <div class="payment-card">
+      <h1 style="margin:0 0 8px; font-size:22px; font-weight:800;">Pembayaran Premium</h1>
+      <p class="helper" style="margin:0 0 10px;">Paket: Analisis Lengkap & CV Tailored – <strong>Rp 25.000</strong></p>
+      <div class="methods">
+        <label class="method"><input type="radio" name="method" value="ewallet" checked /> E-Wallet (OVO/Gopay/DANA)</label>
+        <label class="method"><input type="radio" name="method" value="card" /> Kartu Kredit/Debit</label>
+        <label class="method"><input type="radio" name="method" value="bank" /> Transfer Bank</label>
+      </div>
+    </div>
+
+    <div class="payment-card">
+      <h2 style="margin:0 0 8px; font-size:18px;">Ringkasan Pembelian</h2>
+      <div class="summary">
+        <div>Paket Premium CV Review</div>
+        <div>Harga: <strong>Rp 25.000</strong></div>
+      </div>
+      <div class="actions" style="margin-top: 12px; gap: 8px;">
+        <button id="payConfirm" class="btn btn-primary">Bayar & Unlock</button>
+        <a class="btn btn-outline" href="analysis.html">Kembali</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© 2025 CV Review</div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

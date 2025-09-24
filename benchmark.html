@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Benchmark – Kurva Normal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body id="benchmarkPage">
+  <header class="header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-dot"></div>
+        CV Review
+      </div>
+      <div class="nav-actions">
+        <a href="index.html">Beranda</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="bench-wrap container">
+    <section class="bench-hero">
+      <h1 style="margin:0 0 6px; font-size:22px; font-weight:800;">Kurva Normal (Benchmark Nasional)</h1>
+      <p id="benchPosition" class="bench-note" style="margin: 0 0 6px;">Posisi kamu: —</p>
+      <p id="benchAvg" class="bench-note" style="margin: 0;">Rata-rata skor role ini: —</p>
+    </section>
+
+    <section class="bench-curve">
+      <svg viewBox="0 0 100 40" preserveAspectRatio="none" style="width:100%; height: 160px;">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0%" stop-color="#2563EB" />
+            <stop offset="100%" stop-color="#10B981" />
+          </linearGradient>
+        </defs>
+        <path d="M0,32 C20,32 30,8 50,8 C70,8 80,32 100,32" fill="none" stroke="url(#g)" stroke-width="2" />
+      </svg>
+      <div class="legend"><span>0</span><span>50</span><span>100</span></div>
+      <div style="position:absolute; bottom: 24px; left: 72%; width: 10px; height: 10px; background:#EF4444; border-radius:50%; box-shadow: 0 2px 8px rgba(239,68,68,0.4);"></div>
+    </section>
+
+    <section class="bench-hero">
+      <div class="bench-tabs" style="margin-bottom: 8px;">
+        <button class="bench-tab active">Keyword</button>
+        <button class="bench-tab">Achievements</button>
+        <button class="bench-tab">Format</button>
+      </div>
+      <p class="bench-note" style="margin:0;">Lihat distribusi skor per kategori. Fitur detail hanya untuk Premium.</p>
+      <div class="actions" style="margin-top: 10px;">
+        <button id="unlockBenchmark" class="btn btn-primary">Unlock Premium untuk Kurva Detail</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© 2025 CV Review</div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
