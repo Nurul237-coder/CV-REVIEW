@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
-<body>
+<body id="uploadPage">
   <header class="header">
     <div class="header-inner container">
       <div class="brand">
@@ -37,6 +37,33 @@
             <p>Unggah CV → Pilih role target → Scan → Lihat skor & highlight → Unlock Premium untuk analisis lengkap.</p>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- Combined Landing + Upload (per PRD 4.1) -->
+    <section class="container upload-wrapper" style="margin-top: 0;">
+      <h2 style="font-size:22px; margin: 0 0 12px; font-weight:800;">Mulai dengan unggah CV-mu</h2>
+      <div class="form-row">
+        <div class="card">
+          <div id="dropzone" class="dropzone">
+            <strong>Drag & drop</strong> file ke sini atau klik untuk pilih.
+            <div class="file-meta" id="fileMeta"></div>
+            <input id="fileInput" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+          </div>
+        </div>
+        <div class="select">
+          <label for="roleSelect">Pilih role target</label>
+          <select id="roleSelect">
+            <option>Scholarship</option>
+            <option>Career Switcher</option>
+            <option>Internship</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions" style="margin-top: 16px;">
+        <button id="scanBtn" class="btn btn-primary">🔎 Scan CV</button>
+        <span id="errorText" class="error-text"></span>
+        <span class="helper">PDF/DOC/DOCX • Maks 5MB</span>
       </div>
     </section>
 

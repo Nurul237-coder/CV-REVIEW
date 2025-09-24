@@ -280,7 +280,7 @@ body {
 .rewrite-item { position: relative; background: var(--white); border-radius: var(--radius-xl); box-shadow: var(--shadow); padding: 16px; display: grid; gap: 10px; }
 .rewrite-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .rewrite-title { font-weight: 800; font-size: 15px; }
-.rewrite-body { display: grid; gap: 10px; }
+.rewrite-body { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; align-items: start; }
 .chip { display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; font-size:12px; font-weight:700; background: var(--gray-100); color:#374151; }
 .original, .rewritten { border: 1px solid var(--gray-200); border-radius: 10px; padding: 10px; background: #FCFCFD; }
 .original .label, .rewritten .label { font-size: 12px; color:#6B7280; font-weight: 700; margin-bottom: 6px; }
@@ -357,4 +357,5 @@ body {
   .hero-inner { grid-template-columns: 1fr; }
   .score-card { grid-template-columns: 1fr; justify-items: center; text-align: center; }
   .form-row { grid-template-columns: 1fr; }
+  .rewrite-body { grid-template-columns: 1fr; }
 }

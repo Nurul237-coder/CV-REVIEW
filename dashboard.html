@@ -24,6 +24,9 @@
 
   <main class="dashboard container">
     <section class="kanban">
+      <div class="actions" style="margin-bottom: 10px; display:flex; justify-content: flex-end;">
+        <button id="addAppBtn" class="btn btn-primary">+ New Application</button>
+      </div>
       <div class="columns">
         <div class="column" id="col-draft">
           <h4>Draft CV <span class="status-dot st-draft"></span></h4>
@@ -34,10 +37,6 @@
         </div>
         <div class="column" id="col-submitted">
           <h4>Submitted <span class="status-dot st-submitted"></span></h4>
-          <div class="kanban-card" id="card-2">
-            <div><strong>Magang XYZ</strong></div>
-            <div class="meta"><span>Deadline: 2025-09-30</span><span class="deadline-badge deadline-warning">H-3</span></div>
-          </div>
         </div>
         <div class="column" id="col-interview">
           <h4>Interview <span class="status-dot st-interview"></span></h4>

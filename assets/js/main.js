@@ -491,13 +491,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Premium gating example
     const unlocked = localStorage.getItem('premiumUnlocked') === '1';
-    if (!unlocked) {
-      // Show small CTA in sidebar to unlock
-      const cta = document.getElementById('unlockKanban');
-      cta?.addEventListener('click', () => {
-        window.location.href = 'analysis.html';
+    const cta = document.getElementById('unlockKanban');
+    cta?.addEventListener('click', () => {
+      window.location.href = 'analysis.html';
+    });
+
+    const addBtn = document.getElementById('addAppBtn');
+    addBtn?.addEventListener('click', () => {
+      const currentCards = qsa('.kanban-card');
+      if (!unlocked && currentCards.length >= 1) {
+        alert('Fitur multi-application khusus Premium. Unlock untuk menambahkan lebih dari 1 aplikasi.');
+        return;
+      }
+      const draftCol = document.getElementById('col-draft');
+      const id = 'card-' + Math.random().toString(36).slice(2, 8);
+      const card = document.createElement('div');
+      card.className = 'kanban-card';
+      card.id = id;
+      card.innerHTML = '<div><strong>Aplikasi Baru</strong></div><div class="meta"><span>Deadline: TBA</span><span class="deadline-badge">H-7</span></div>';
+      card.setAttribute('draggable', 'true');
+      card.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', card.id);
       });
-    }
+      draftCol?.appendChild(card);
+    });
   }
 
   // Benchmark page interactions
