@@ -118,23 +118,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const role = params.get('role') || 'Scholarship';
 
-    const tabs = qsa('.tab');
     const sections = qsa('.form-section');
     const toAnalysisBtn = qs('#toAnalysisBtn');
     const roleLabel = qs('#rolePicked');
+    const roleChip = qs('#roleChip');
+    const roleEmoji = qs('#roleEmoji');
+    const roleFocusCopy = qs('#roleFocusCopy');
+    const degreeSelect = qs('#degreeLevel');
+    const researchField = qs('#researchField');
+    const languageScoreInput = qs('#languageScore');
+    const plannedTestField = qs('#plannedTestField');
+
+    let currentRole = role;
 
     function setActiveRole(r) {
+      currentRole = r;
       roleLabel.textContent = r;
-      tabs.forEach(t => t.classList.toggle('active', t.dataset.role === r));
       sections.forEach(s => s.classList.toggle('active', s.dataset.role === r));
-      document.body.classList.remove('scholarship', 'switcher', 'internship');
+      document.body.classList.remove('scholarship', 'switcher', 'internship', 'professional', 'jobseeker');
       if (r === 'Scholarship') document.body.classList.add('scholarship');
-      if (r === 'Career Switcher') document.body.classList.add('switcher');
-      if (r === 'Internship') document.body.classList.add('internship');
+      if (r === 'Jobseeker') document.body.classList.add('jobseeker');
+
+      const emojiMap = { Scholarship: '🎓', Jobseeker: '💼' };
+      if (roleEmoji) roleEmoji.textContent = emojiMap[r] || '🎯';
+
+      const focusMap = {
+        Scholarship: 'Pertanyaan khusus untuk kebutuhan beasiswa dan kesiapan akademik kamu.',
+        Jobseeker: 'Isi detail pengalaman, skill, dan motivasi agar analisis cocok dengan target kerja kamu.'
+      };
+      if (roleFocusCopy) roleFocusCopy.textContent = focusMap[r] || 'Jawab pertanyaan sesuai kebutuhan program ini.';
+
+      if (roleChip) {
+        roleChip.classList.remove('accent-green', 'accent-blue');
+        const chipAccent = r === 'Scholarship' ? 'accent-green' : r === 'Jobseeker' ? 'accent-blue' : '';
+        if (chipAccent) roleChip.classList.add(chipAccent);
+      }
+
+      if (r === 'Scholarship') {
+        updateScholarshipConditional();
+        updateLanguageConditional();
+      }
+      if (r === 'Jobseeker') setJobseekerDefaults();
     }
 
-    tabs.forEach(tab => tab.addEventListener('click', () => setActiveRole(tab.dataset.role)));
-    setActiveRole(role);
+    const availableRoles = sections.map(section => section.dataset.role);
+    setActiveRole(availableRoles.includes(role) ? role : 'Scholarship');
 
     function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
     function scale(val, inMin, inMax, outMin, outMax) {
@@ -143,15 +171,119 @@ document.addEventListener('DOMContentLoaded', () => {
       return outMin + t * (outMax - outMin);
     }
 
+    function parseNumberFromText(text) {
+      if (!text) return NaN;
+      const match = text.replace(',', '.').match(/\d+(?:\.\d+)?/);
+      return match ? parseFloat(match[0]) : NaN;
+    }
+
+    function parseGpa(text) {
+      if (!text) return { value: 0, normalized: 0 };
+      const matches = text.replace(',', '.').match(/\d+(?:\.\d+)?/g);
+      if (!matches || matches.length === 0) return { value: 0, normalized: 0 };
+      const gpa = parseFloat(matches[0]);
+      let scaleVal = 4;
+      if (matches.length > 1) {
+        const parsedScale = parseFloat(matches[1]);
+        if (!Number.isNaN(parsedScale) && parsedScale > 0) scaleVal = parsedScale;
+      }
+      const normalized = clamp((gpa / scaleVal) * 4, 0, 4);
+      return { value: gpa, normalized };
+    }
+
+    function languageMax(text, numeric) {
+      if (!text) return 9;
+      const lower = text.toLowerCase();
+      if (lower.includes('toefl') || numeric > 9 || lower.includes('ibt')) return 120;
+      if (lower.includes('duolingo') || lower.includes('duo')) return 160;
+      return 9;
+    }
+
+    function updateScholarshipConditional() {
+      if (!researchField || !degreeSelect) return;
+      const value = degreeSelect.value;
+      const showResearch = value === 'Master' || value === 'PhD';
+      researchField.classList.toggle('hidden', !showResearch);
+    }
+
+    function updateLanguageConditional() {
+      if (!plannedTestField || !languageScoreInput) return;
+      const text = (languageScoreInput.value || '').toLowerCase();
+      const showPlanned = !text || text.includes('belum');
+      plannedTestField.classList.toggle('hidden', !showPlanned);
+    }
+
+    degreeSelect?.addEventListener('change', updateScholarshipConditional);
+    languageScoreInput?.addEventListener('input', updateLanguageConditional);
+
+    function setJobseekerDefaults() {
+      // Placeholder for future dynamic defaults.
+    }
+
     function computeScholarship() {
-      const ipk = parseFloat(qs('#ipk')?.value || '0'); // 0..4
-      const awardsLen = (qs('#awards')?.value || '').trim().length;
-      const testRaw = parseFloat(qs('#testScore')?.value || '0'); // IELTS up to 9, TOEFL up to 120
-      const academic = Math.round(scale(clamp(ipk, 0, 4), 0, 4, 45, 95));
-      const leadership = Math.round(scale(clamp(awardsLen, 0, 400), 0, 400, 40, 90));
-      const maxTest = testRaw <= 9 ? 9 : 120;
-      const research = Math.round(scale(clamp(testRaw, 0, maxTest), 0, maxTest, 40, 90));
-      return { labels: ['Academic Strength', 'Leadership', 'Research Fit'], scores: [academic, leadership, research] };
+      const { normalized: gpaNormalized } = parseGpa(qs('#gpaScore')?.value || '');
+      const degree = degreeSelect?.value || '';
+      const academicBase = Math.round(scale(gpaNormalized, 0, 4, 45, 90));
+      const degreeBonus = degree === 'PhD' ? 6 : degree === 'Master' ? 4 : degree === 'Bachelor' ? 2 : 0;
+      const academic = clamp(academicBase + degreeBonus, 40, 96);
+
+      const languageText = (languageScoreInput?.value || '').trim();
+      const languageNumeric = parseNumberFromText(languageText);
+      const maxTest = languageMax(languageText, languageNumeric);
+      const plannedDate = qs('#plannedTestDate')?.value;
+      const scoreExpiry = qs('#scoreExpiry')?.value;
+      const hasValidScore = !Number.isNaN(languageNumeric) && languageNumeric > 0;
+      const languageScaled = hasValidScore ? Math.round(scale(clamp(languageNumeric, 0, maxTest), 0, maxTest, 40, 92)) : 45;
+      let expiryBonus = 0;
+      if (scoreExpiry) {
+        const expiry = new Date(scoreExpiry);
+        const now = new Date();
+        const diffDays = (expiry - now) / (1000 * 60 * 60 * 24);
+        expiryBonus = diffDays > 365 ? 3 : diffDays > 180 ? 1 : diffDays < 0 ? -5 : 0;
+      }
+      const plannedBonus = !hasValidScore && plannedDate ? 4 : 0;
+      const language = clamp(languageScaled + expiryBonus + plannedBonus, 35, 94);
+
+      const workLen = (qs('#workRelevance')?.value || '').trim().length;
+      const leadershipLen = (qs('#leadershipStory')?.value || '').trim().length;
+      const volunteerLen = (qs('#volunteerImpact')?.value || '').trim().length;
+      const researchLen = (qs('#researchAchievements')?.value || '').trim().length;
+      const additional = (qs('#additionalTests')?.value || '').trim();
+      const experienceBase = Math.round(scale(clamp(workLen + leadershipLen + volunteerLen, 0, 1200), 0, 1200, 42, 92));
+      const researchBonus = researchLen > 0 ? 3 : 0;
+      const additionalBonus = additional ? 2 : 0;
+      const experience = clamp(experienceBase + researchBonus + additionalBonus, 40, 95);
+
+      return {
+        labels: ['Academic Background', 'Language Readiness', 'Experience Impact'],
+        scores: [academic, language, experience]
+      };
+    }
+
+    function textLen(selector) {
+      return (qs(selector)?.value || '').trim().length;
+    }
+
+    function computeJobseeker() {
+      const backgroundLen = textLen('#jsCurrentBackground');
+      const targetLen = textLen('#jsTargetRole');
+      const skillsLen = textLen('#jsSkillsCerts');
+      const workLen = textLen('#jsWorkExperience');
+      const motivationLen = textLen('#jsMotivation');
+      const leadershipLen = textLen('#jsLeadership');
+      const communicationLen = textLen('#jsCommunication');
+      const adjustableLen = textLen('#jsAdjustable');
+      const portfolioLen = textLen('#jsPortfolio');
+      const availability = textLen('#jsAvailability');
+
+      const profile = Math.round(scale(clamp(backgroundLen + targetLen + motivationLen, 0, 1500), 0, 1500, 45, 96));
+      const experience = Math.round(scale(clamp(workLen + skillsLen + availability + portfolioLen, 0, 1500), 0, 1500, 44, 94));
+      const polish = Math.round(scale(clamp(leadershipLen + communicationLen + adjustableLen, 0, 1200), 0, 1200, 42, 92));
+
+      return {
+        labels: ['Experience Background', 'Market Readiness', 'Differentiation'],
+        scores: [profile, experience, polish]
+      };
     }
 
     function computeSwitcher() {
@@ -177,13 +309,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function computeForRole(r) {
       if (r === 'Scholarship') return computeScholarship();
+      if (r === 'Jobseeker') return computeJobseeker();
       if (r === 'Career Switcher') return computeSwitcher();
       if (r === 'Internship') return computeIntern();
       return { labels: ['A', 'B', 'C'], scores: [60, 60, 60] };
     }
 
     toAnalysisBtn.addEventListener('click', () => {
-      const active = tabs.find(t => t.classList.contains('active'))?.dataset.role || 'Scholarship';
+      const active = currentRole;
       const { labels, scores } = computeForRole(active);
       const score = Math.round((scores[0] + scores[1] + scores[2]) / 3);
       const q = new URLSearchParams();
@@ -194,45 +327,33 @@ document.addEventListener('DOMContentLoaded', () => {
       q.set('s3', String(scores[2]));
       // Also pass labels in case we want customization (optional)
       q.set('l1', labels[0]); q.set('l2', labels[1]); q.set('l3', labels[2]);
+      if (active === 'Jobseeker') {
+        const targetRole = (qs('#jsTargetRole')?.value || '').trim();
+        const background = (qs('#jsCurrentBackground')?.value || '').trim();
+        const location = (qs('#jsAvailability')?.value || '').trim();
+        const industry = (qs('#jsSkillsCerts')?.value || '').trim();
+        const motivation = (qs('#jsMotivation')?.value || '').trim();
+        if (targetRole) q.set('targetRole', targetRole);
+        if (industry) q.set('targetIndustry', industry);
+        if (location) q.set('targetLocation', location);
+        if (background) q.set('experienceLabel', background.split('\n')[0].slice(0, 60));
+        if (motivation) q.set('motivation', motivation);
+      }
+      if (active === 'Scholarship') {
+        const field = (qs('#intendedField')?.value || '').trim();
+        const destination = (qs('#destinationPref')?.value || '').trim();
+        if (field) q.set('targetField', field);
+        if (destination) q.set('targetLocation', destination);
+      }
       window.location.href = `analysis.html?${q.toString()}`;
     });
-  }
 
-  // Analysis page rendering
-  if (isAnalysis) {
-    const params = new URLSearchParams(window.location.search);
-    const score = Math.max(0, Math.min(100, parseInt(params.get('score') || '65', 10)));
-    const role = params.get('role') || 'General';
-
-    const scoreCircle = qs('.score-circle');
-    const valueEl = qs('#scoreValue');
-    const roleEl = qs('#roleLabel');
-    const dot = qs('#curveDot');
-    const subScores = qs('#subScores');
-    const bar1Fill = qs('#bar1Fill');
-    const bar2Fill = qs('#bar2Fill');
-    const bar3Fill = qs('#bar3Fill');
-    const bar1Val = qs('#bar1Value');
-    const bar2Val = qs('#bar2Value');
-    const bar3Val = qs('#bar3Value');
-    const bar1Label = qs('#bar1Label');
-    const bar2Label = qs('#bar2Label');
-    const bar3Label = qs('#bar3Label');
-    const rewriteList = qs('#rewriteList');
-    const previewCard = qs('#previewCard');
-    const previewSummary = qs('#previewSummary');
-    const previewProjects = qs('#previewProjects');
-    const previewSkills = qs('#previewSkills');
-    const downloadBtn = qs('#downloadBtn');
-    const lockModal = qs('#lockModal');
-    const goToPayment = qs('#goToPayment');
-    const stayFree = qs('#stayFree');
     const closeLock = qs('#closeLock');
 
     // Update score circle
     scoreCircle.style.setProperty('--score', String(score));
     valueEl.innerHTML = `${score}<small>/100</small>`;
-    roleEl.textContent = role;
+    roleEl.textContent = jobLevel ? `${role} – ${jobLevel}` : role;
 
     // Position dot along the curve: map 0..100 -> 5%..95%
     const pct = 5 + (score / 100) * 90;
@@ -241,6 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sub-scores
     const defaults = {
       Scholarship: { labels: ['Academic Strength', 'Leadership', 'Research Fit'] },
+      Jobseeker: { labels: ['Experience Background', 'Market Readiness', 'Differentiation'] },
       'Career Switcher': { labels: ['Transferable Skills', 'Role Relevansi', 'Narrative'] },
       Internship: { labels: ['Project Fit', 'Organization/Activity', 'Growth Potential'] },
     };
@@ -258,19 +380,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Accent class
     const accentMap = {
       Scholarship: 'accent-green',
+      Jobseeker: 'accent-blue',
       'Career Switcher': 'accent-orange',
       Internship: 'accent-purple',
     };
     const accent = accentMap[role] || '';
     [bar1Fill, bar2Fill, bar3Fill].forEach(el => {
-      el?.classList.remove('accent-green', 'accent-orange', 'accent-purple');
+      el?.classList.remove('accent-green', 'accent-orange', 'accent-purple', 'accent-blue');
       if (accent && el) el.classList.add(accent);
     });
 
     // Set labels and widths
     if (bar1Label) bar1Label.textContent = labels[0];
-    if (bar2Label) bar2Label.textContent = labels[1];
-    if (bar3Label) bar3Label.textContent = labels[2];
+    if (backgroundEl && role !== 'Scholarship') {
+      backgroundEl.textContent = role === 'Jobseeker' ? (params.get('motivation') || 'Jobseeker background') : 'General profile';
+    }
+    if (badgeEl) badgeEl.textContent = `${role} Snapshot`;
     if (bar1Val) bar1Val.textContent = scores[0] + '/100';
     if (bar2Val) bar2Val.textContent = scores[1] + '/100';
     if (bar3Val) bar3Val.textContent = scores[2] + '/100';
@@ -319,6 +444,24 @@ document.addEventListener('DOMContentLoaded', () => {
             rewritten: 'Built a public case study: redesigned onboarding flow, defined success metrics (activation rate), and delivered prototype validated by 5 user interviews.'
           },
         ];
+      } else if (role === 'Jobseeker') {
+        items = [
+          {
+            title: 'Jobseeker Summary — rewrite',
+            original: 'Profesional dengan pengalaman relevan ingin mengejar peran baru.',
+            rewritten: `Strategic professional targeting ${params.get('l1') || 'role baru'}; menghubungkan pengalaman saat ini dengan kebutuhan bisnis dan menunjukkan kesiapan untuk kontribusi instan.`
+          },
+          {
+            title: 'Jobseeker Experience Highlight',
+            original: 'Mengelola beberapa proyek dan tim kecil.',
+            rewritten: 'Led cross-functional squad to deliver campaign impacting revenue +15%, mentored junior members, dan membangun SOP untuk scale-up.'
+          },
+          {
+            title: 'Jobseeker Growth Plan',
+            original: 'Sedang mengikuti pelatihan untuk upgrade skill.',
+            rewritten: 'Mapped 90-day upskilling plan: advanced certification, peer mentoring, dan pilot project yang menunjukkan kesiapan memasuki domain baru.'
+          },
+        ];
       } else { // Internship
         items = [
           {
@@ -358,11 +501,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sprint 3: Preview CV content
     if (previewCard) {
       // Set accent class
-      previewCard.classList.remove('accent-green', 'accent-orange', 'accent-purple');
+      previewCard.classList.remove('accent-green', 'accent-orange', 'accent-purple', 'accent-blue');
       if (accent) previewCard.classList.add(accent);
 
       // Populate simple preview content per role
-      const byRole = {
+      const previewData = {
         Scholarship: {
           summary: 'Scholarship-focused candidate with solid academics and consistent leadership impact. Interested in research on [topic] with community contribution.',
           projects: [
@@ -370,6 +513,14 @@ document.addEventListener('DOMContentLoaded', () => {
             'Capstone project: built prototype addressing [problem]; presented to faculty panel.'
           ],
           skills: 'Academic Writing • Research Methods • Data Analysis • Leadership'
+        },
+        Jobseeker: {
+          summary: `Strategic professional targeting ${params.get('targetRole') || 'role baru'}; menonjolkan pengalaman, skill, dan motivasi yang siap dijual ke perusahaan target.`,
+          projects: [
+            'Key accomplishment: delivered measurable impact (e.g., +18% revenue, -25% churn) dengan kolaborasi lintas tim.',
+            'Growth plan: 90-day roadmap (sertifikasi, mentoring, project sampel) untuk mempercepat adaptasi di role baru.'
+          ],
+          skills: 'Strategic Execution • Stakeholder Management • Impact Storytelling • Continuous Learning'
         },
         'Career Switcher': {
           summary: 'Career switcher transitioning into [target role]; strong transferable skills across analysis, communication, and project delivery.',
@@ -388,7 +539,8 @@ document.addEventListener('DOMContentLoaded', () => {
           skills: 'HTML/CSS/JS • Python/Excel • Teamwork • Communication'
         }
       };
-      const data = byRole[role] || byRole.Scholarship;
+      const entry = previewData[role] || previewData.Scholarship;
+      const data = typeof entry === 'function' ? entry() : entry;
       if (previewSummary) previewSummary.textContent = data.summary;
       if (previewSkills) previewSkills.textContent = data.skills;
       if (previewProjects) {
@@ -438,23 +590,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (downloadBtn) {
       downloadBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        if (unlocked) {
-          alert('Mengunduh CV ATS-friendly (mock).');
-        } else {
-          openLock();
-        }
+        // Simulate payment success
+        localStorage.setItem('premiumUnlocked', '1');
+        window.location.href = 'payment-success.html';
       });
     }
-  }
 
-  // Payment page logic
-  if (isPayment) {
-    const payBtn = document.getElementById('payConfirm');
-    payBtn?.addEventListener('click', () => {
-      // Simulate payment success
-      localStorage.setItem('premiumUnlocked', '1');
-      window.location.href = 'payment-success.html';
-    });
   }
 
   // Payment success page logic

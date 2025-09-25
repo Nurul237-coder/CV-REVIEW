@@ -24,83 +24,230 @@
 
   <main class="container" style="max-width: 920px;">
     <section class="card">
-      <div style="display:flex; justify-content: space-between; align-items: center; gap: 12px;">
-        <h1 style="font-size:24px; margin: 0; font-weight:800;">Form Spesifik Role</h1>
-        <div class="badge warn">Role: <span id="rolePicked" style="margin-left:6px; font-weight:800;">Scholarship</span></div>
-      </div>
-      <div class="tabs" style="margin-top: 12px;">
-        <button type="button" class="tab" data-role="Scholarship">🎓 Scholarship</button>
-        <button type="button" class="tab" data-role="Career Switcher">🔁 Career Switcher</button>
-        <button type="button" class="tab" data-role="Internship">👩‍💻 Internship</button>
+      <div style="display:flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <div>
+          <h1 style="font-size:24px; margin: 0; font-weight:800;">Form Spesifik Role</h1>
+          <p class="helper" id="roleFocusCopy" style="margin:4px 0 0;">Jawab pertanyaan sesuai kebutuhan program ini.</p>
+        </div>
+        <span class="role-chip" id="roleChip">
+          <span class="emoji" id="roleEmoji">🎓</span>
+          <span id="rolePicked">Scholarship</span>
+        </span>
       </div>
 
       <!-- Scholarship form -->
       <div class="form-section" data-role="Scholarship">
         <div class="form-grid">
-          <div class="field">
-            <label for="ipk">IPK (0.00–4.00)</label>
-            <input id="ipk" type="number" step="0.01" min="0" max="4" placeholder="contoh 3.75" />
-          </div>
-          <div class="field">
-            <label for="testScore">Test Score (IELTS 0–9 atau TOEFL 0–120)</label>
-            <input id="testScore" type="number" step="0.1" min="0" max="120" placeholder="IELTS 7.5 atau TOEFL 95" />
+          <div class="section-label">Scholarship Target</div>
+          <div class="scholarship-options" role="radiogroup" aria-label="Target scholarship">
+            <label class="scholarship-card">
+              <input type="radio" name="scholarshipTarget" value="LPDP" checked />
+              <div class="logo"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Logo_LPDP_%28Lembaga_Pengelola_Dana_Pendidikan%29.svg/256px-Logo_LPDP_%28Lembaga_Pengelola_Dana_Pendidikan%29.svg.png" alt="LPDP" loading="lazy" /></div>
+              <span class="name">LPDP</span>
+            </label>
+            <label class="scholarship-card">
+              <input type="radio" name="scholarshipTarget" value="Chevening" />
+              <div class="logo"><img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/95/Chevening_logo.svg/320px-Chevening_logo.svg.png" alt="Chevening" loading="lazy" /></div>
+              <span class="name">Chevening</span>
+            </label>
+            <label class="scholarship-card">
+              <input type="radio" name="scholarshipTarget" value="Fulbright" />
+              <div class="logo"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Fulbright_Program_logo.svg/320px-Fulbright_Program_logo.svg.png" alt="Fulbright" loading="lazy" /></div>
+              <span class="name">Fulbright</span>
+            </label>
+            <label class="scholarship-card">
+              <input type="radio" name="scholarshipTarget" value="New Zealand" />
+              <div class="logo"><img src="https://upload.wikimedia.org/wikipedia/en/thumb/3/37/New_Zealand_Scholarships_logo.svg/320px-New_Zealand_Scholarships_logo.svg.png" alt="New Zealand Scholarships" loading="lazy" /></div>
+              <span class="name">New Zealand</span>
+            </label>
           </div>
           <div class="field" style="grid-column: 1 / -1;">
-            <label for="awards">Awards/Achievements</label>
-            <textarea id="awards" placeholder="Tuliskan penghargaan, kompetisi, riset, publikasi, dsb."></textarea>
+            <label for="otherScholarship">Nama beasiswa lain <span class="field-note">(opsional)</span></label>
+            <input id="otherScholarship" type="text" placeholder="contoh Erasmus Mundus Joint Master Degree" />
+          </div>
+
+          <div class="section-label">Academic Background</div>
+          <div class="field">
+            <label for="degreeLevel">Current highest degree</label>
+            <select id="degreeLevel">
+              <option value="">Pilih salah satu</option>
+              <option value="High School">High School / SMA</option>
+              <option value="Bachelor">Bachelor / S1</option>
+              <option value="Master">Master / S2</option>
+              <option value="PhD">Doctoral / S3</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="gpaScore">GPA (sertakan skala)</label>
+            <input id="gpaScore" type="text" placeholder="contoh 3.54 / 4.00" />
+          </div>
+          <div class="field">
+            <label for="intendedField">Field of study / intended major</label>
+            <input id="intendedField" type="text" placeholder="contoh Public Policy, Data Science" />
+          </div>
+          <div class="field">
+            <label for="destinationPref">Destination country & university preference <span class="field-note">(opsional)</span></label>
+            <textarea id="destinationPref" placeholder="contoh: UK – University of Oxford, USA – Columbia"></textarea>
+          </div>
+          <div class="field">
+            <label for="intakeTerm">Intake / start term (Term + Year)</label>
+            <input id="intakeTerm" type="text" placeholder="contoh Fall 2026" />
+          </div>
+
+          <div class="section-label">Language Proficiency</div>
+          <div class="field">
+            <label for="languageScore">IELTS/TOEFL/Duolingo score</label>
+            <input id="languageScore" type="text" placeholder="contoh IELTS 7.5 (Listening 8.0)" />
+            <span class="field-note">Isi "Belum tes" jika belum memiliki skor.</span>
+          </div>
+          <div class="field">
+            <label for="scoreExpiry">Score expiry date</label>
+            <input id="scoreExpiry" type="date" />
+          </div>
+          <div class="field hidden" id="plannedTestField">
+            <label for="plannedTestDate">Planned test date</label>
+            <input id="plannedTestDate" type="date" />
+            <span class="field-note">Muncul bila skor belum tersedia.</span>
+          </div>
+
+          <div class="section-label">Experience & Achievements</div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="workRelevance">Work experience relevance</label>
+            <textarea id="workRelevance" placeholder="Ringkas pengalaman kerja, peran, dan dampak yang mendukung jurusan tujuan."></textarea>
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="leadershipStory">Extracurricular / leadership roles</label>
+            <textarea id="leadershipStory" placeholder="Organisasi, posisi, jumlah anggota, program, dan metrik keberhasilan."></textarea>
+          </div>
+          <div class="field hidden" id="researchField" style="grid-column: 1 / -1;">
+            <label for="researchAchievements">Research / publications <span class="field-note">(jika Master/PhD)</span></label>
+            <textarea id="researchAchievements" placeholder="Tuliskan judul riset, publikasi, konferensi, dsb."></textarea>
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="volunteerImpact">Volunteering / community involvement</label>
+            <textarea id="volunteerImpact" placeholder="Highlight dampak sosial, jumlah penerima manfaat, outcome terukur."></textarea>
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="additionalTests">Additional tests (GRE/GMAT/JLPT/TestDaF) <span class="field-note">(opsional)</span></label>
+            <input id="additionalTests" type="text" placeholder="contoh GRE 320 (Q165/V155), JLPT N2" />
           </div>
         </div>
       </div>
 
       <!-- Career Switcher form -->
       <div class="form-section" data-role="Career Switcher">
+        <div class="section-label">Experience Background</div>
         <div class="form-grid">
-          <div class="field">
-            <label for="roleFrom">Role Asal</label>
-            <select id="roleFrom">
-              <option value="">Pilih salah satu</option>
-              <option>Non-IT</option>
-              <option>Support</option>
-              <option>Finance/Accounting</option>
-              <option>Sales/Marketing</option>
-              <option>Operations</option>
-              <option>Design</option>
-              <option>QA/Testing</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="roleTo">Role Tujuan</label>
-            <select id="roleTo">
-              <option value="">Pilih salah satu</option>
-              <option>Software Engineer</option>
-              <option>Data Analyst</option>
-              <option>Product Manager</option>
-              <option>UI/UX Designer</option>
-              <option>Digital Marketer</option>
-              <option>Business Analyst</option>
-            </select>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="csCurrentBackground">Current background</label>
+            <textarea id="csCurrentBackground" placeholder="Sebutkan industri saat ini, total tahun pengalaman, dan role terakhir."></textarea>
           </div>
           <div class="field" style="grid-column: 1 / -1;">
-            <label for="skills">Transferable Skills</label>
-            <textarea id="skills" placeholder="Tulis skill yang relevan (contoh: analisis data, komunikasi, manajemen proyek, dsb.)"></textarea>
+            <label for="csTargetRole">Target role / industry</label>
+            <textarea id="csTargetRole" placeholder="Role atau industri tujuan (contoh: Product Manager di Tech, Data Analyst di Consulting)"></textarea>
+          </div>
+        </div>
+
+        <div class="section-label">Bridging Skills</div>
+        <div class="form-grid">
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="csCerts">Certifications / bootcamps / training</label>
+            <textarea id="csCerts" placeholder="Tuliskan kursus, sertifikasi, atau pelatihan yang sudah kamu selesaikan."></textarea>
+          </div>
+        </div>
+
+        <div class="section-label">Portfolio & Experience</div>
+        <div class="form-grid">
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="csProjects">Side projects / volunteering / freelance</label>
+            <textarea id="csProjects" placeholder="Contoh proyek, pengalaman freelance, atau volunteering yang relevan dengan role tujuan."></textarea>
+          </div>
+        </div>
+
+        <div class="section-label">Compensation & Commitment</div>
+        <div class="form-grid">
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="csSalary">Salary expectation & flexibility</label>
+            <input id="csSalary" type="text" placeholder="Misal: IDR 10–14 jt / bulan, bersedia mulai di posisi junior" />
           </div>
         </div>
       </div>
 
-      <!-- Internship form -->
-      <div class="form-section" data-role="Internship">
+      <!-- Jobseeker form -->
+      <div class="form-section" data-role="Jobseeker">
+        <div class="section-label">Experience Background</div>
         <div class="form-grid">
           <div class="field" style="grid-column: 1 / -1;">
-            <label for="projects">Academic Projects</label>
-            <textarea id="projects" placeholder="Deskripsikan proyek kuliah/mandiri, teknologi, kontribusi, hasil."></textarea>
+            <label for="jsCurrentBackground">Current background (education, role, industry)</label>
+            <textarea id="jsCurrentBackground" placeholder="Ceritakan latar belakang pendidikan, role terakhir, dan industri saat ini."></textarea>
           </div>
           <div class="field" style="grid-column: 1 / -1;">
-            <label for="org">Organization/Volunteer Experience</label>
-            <textarea id="org" placeholder="Aktivitas organisasi, event, panitia, volunteer, peran dan dampak."></textarea>
+            <label for="jsTargetRole">Target role atau industry</label>
+            <textarea id="jsTargetRole" placeholder="Entry-level, mid-level, freelance, remote — jelaskan role atau industri yang dituju."></textarea>
+          </div>
+          <div class="field">
+            <label for="jsSkillsCerts">Skills &amp; certifications acquired</label>
+            <textarea id="jsSkillsCerts" placeholder="Sertifikasi, bootcamp, technical/soft skills yang sudah dimiliki."></textarea>
+          </div>
+          <div class="field">
+            <label for="jsWorkExperience">Work experience</label>
+            <textarea id="jsWorkExperience" placeholder="Total tahun pengalaman dan relevansi terhadap job target."></textarea>
+          </div>
+          <div class="field">
+            <label for="jsMotivation">Career motivation</label>
+            <textarea id="jsMotivation" placeholder="Alasan growth, switch, remote lifestyle, atau first job."></textarea>
+          </div>
+          <div class="field">
+            <label for="jsSalaryExpectation">Salary expectation / preferred rate</label>
+            <input id="jsSalaryExpectation" type="text" placeholder="contoh: IDR 10–12 jt / bulan atau Rp150k/jam" />
+          </div>
+          <div class="field">
+            <label for="jsAvailability">Availability</label>
+            <input id="jsAvailability" type="text" placeholder="Full-time, part-time, project-based, remote" />
+          </div>
+        </div>
+
+        <div class="section-label">Work Setup & Region</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Preferensi kerja</label>
+            <div class="option-group" role="radiogroup" aria-label="Preferensi kerja">
+              <label class="option-pill"><input type="radio" name="jsWorkMode" value="WFH" checked /> WFH</label>
+              <label class="option-pill"><input type="radio" name="jsWorkMode" value="WFO" /> WFO</label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Region pilihan</label>
+            <div class="option-group" role="radiogroup" aria-label="Region pilihan">
+              <label class="option-pill"><input type="radio" name="jsRegion" value="Indonesia" checked /> Indonesia</label>
+              <label class="option-pill"><input type="radio" name="jsRegion" value="Malaysia" /> Malaysia</label>
+              <label class="option-pill"><input type="radio" name="jsRegion" value="Singapura" /> Singapura</label>
+              <label class="option-pill"><input type="radio" name="jsRegion" value="Australia" /> Australia</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-label">Additional Document</div>
+        <div class="form-grid">
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="jsPortfolio">Portfolio &amp; related documents</label>
+            <textarea id="jsPortfolio" placeholder="Lampirkan link portfolio, GitHub, Behance, atau dokumen pendukung lainnya."></textarea>
+          </div>
+        </div>
+
+        <div class="section-label">Additional points for output</div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="jsLeadership">Leadership highlight</label>
+            <textarea id="jsLeadership" placeholder="Pengalaman memimpin tim, koordinasi proyek, mentoring."></textarea>
+          </div>
+          <div class="field">
+            <label for="jsCommunication">Communication skill</label>
+            <textarea id="jsCommunication" placeholder="Contoh presentasi, stakeholder management, negosiasi."></textarea>
           </div>
           <div class="field" style="grid-column: 1 / -1;">
-            <label for="coursework">Coursework Relevan</label>
-            <textarea id="coursework" placeholder="Mata kuliah terkait (contoh: Algoritma, Statistik, Desain Produk, dsb.)"></textarea>
+            <label for="jsAdjustable">Adjustable notes</label>
+            <textarea id="jsAdjustable" placeholder="Hal-hal yang bisa disesuaikan berdasarkan kebutuhan perusahaan (tools, lokasi, jam kerja)"></textarea>
           </div>
         </div>
       </div>

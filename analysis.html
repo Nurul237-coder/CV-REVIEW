@@ -65,6 +65,77 @@
       <div class="bell-legend"><span>Rendah</span><span>Tinggi</span></div>
     </section>
 
+    <section id="suggestedMatches" class="card suggest-card">
+      <div class="suggest-head">
+        <h3>Suggested Matches</h3>
+        <p class="helper">Role, industri, ukuran perusahaan, dan range gaji yang relevan berdasarkan profil kamu.</p>
+      </div>
+      <div class="info-callout">
+        <strong>Bagaimana memanfaatkan rekomendasi ini?</strong>
+        <ul>
+          <li>Ada banyak opsi agar kamu bisa membandingkan lintasan karier yang paling pas.</li>
+          <li>Gunakan rating untuk memvalidasi kecocokan saat ini dan cek area yang masih perlu ditingkatkan.</li>
+          <li>Lihat juga opsi alternatif supaya kamu tahu jalur lain yang bisa dicoba sambil terus upgrade skill.</li>
+        </ul>
+      </div>
+      <div class="suggest-grid">
+        <div class="suggest-column">
+          <h4>Suggested Roles</h4>
+          <ul id="suggestRoles" class="suggest-list"></ul>
+        </div>
+        <div class="suggest-column">
+          <h4>Suggested Industries</h4>
+          <ul id="suggestIndustries" class="suggest-list"></ul>
+        </div>
+        <div class="suggest-column">
+          <h4>Suggested Company Sizes</h4>
+          <ul id="suggestCompanySizes" class="suggest-list"></ul>
+        </div>
+        <div class="suggest-column">
+          <h4>Suggested Target Salaries</h4>
+          <ul id="suggestSalaries" class="suggest-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="profileSummary" class="card profile-card">
+      <div class="profile-head">
+        <div>
+          <h3 style="margin:0">Scores &amp; Profile</h3>
+          <p class="helper">Quality menilai best practice CV. Industry fit menilai kecocokan profil terhadap role &amp; industri.</p>
+        </div>
+        <span class="badge neutral" id="profileBadge">Snapshot</span>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-metric">
+          <span class="label">Quality</span>
+          <span class="value" id="qualityScore">63</span>
+          <span class="hint">0–100</span>
+        </div>
+        <div class="profile-metric">
+          <span class="label">Industry fit</span>
+          <span class="value" id="industryScore">72</span>
+          <span class="hint">0–100</span>
+        </div>
+        <div class="profile-metric">
+          <span class="label">Experience</span>
+          <span class="value" id="experienceLabel">Early-career (1–2 years)</span>
+        </div>
+        <div class="profile-metric">
+          <span class="label">Region</span>
+          <span class="value" id="regionLabel">Indonesia</span>
+        </div>
+        <div class="profile-metric">
+          <span class="label">Role focus</span>
+          <span class="value" id="roleFocus">IT Project Manager (Associate)</span>
+        </div>
+        <div class="profile-metric">
+          <span class="label">University / Background</span>
+          <span class="value" id="backgroundLabel">Telkom University</span>
+        </div>
+      </div>
+    </section>
+
     <!-- Sprint 3: Auto-Rewrite Suggestions -->
     <section class="card">
       <div class="rewrite-header">

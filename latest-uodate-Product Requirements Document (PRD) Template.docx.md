@@ -123,7 +123,7 @@ As a user, I want to see a quick and role-specific analysis of my CV so that I c
 * Mini bell curve menandai posisi user.  
 * Form tambahan sesuai role:
 
-  * Scholarship: IPK, Awards, Test Score.
+  * Scholarship: Academic Background, Language Proficiency, Experience & Achievements (detail pada 4.2.1).
 
   * Career Switcher: Role Asal, Role Tujuan, Transferable Skills.
 
@@ -133,6 +133,55 @@ As a user, I want to see a quick and role-specific analysis of my CV so that I c
 * CTA premium muncul setelah analisis ditampilkan.
 
   ---
+
+#### 4.2.1 Scholarship Intake – Minimal Fields
+
+| Group | Field | Type | Status | Notes |
+| --- | --- | --- | --- | --- |
+| **Scholarship Target** | Scholarship choice (LPDP, Chevening, Fulbright, New Zealand) | Radio + logo | Required | Kartu radio dengan logo resmi; menentukan preset rekomendasi rewrite. |
+|  | Other scholarship name | Text input | Optional | Free text bila pilihan utama tidak tersedia. |
+| **Academic Background** | Current highest degree | Select (HS/Bachelor/Master/PhD) | Required | Menentukan konteks akademik dan trigger field riset. |
+|  | GPA (with scale) | Text input | Required | Format bebas, sistem normalisasi otomatis (`3.54 / 4.00`). |
+|  | Field of study / intended major | Text input | Required | Dipakai untuk rekomendasi rewrite & benchmark bidang. |
+|  | Destination country & university preference | Textarea | Optional | Multi-line (supports beberapa opsi). |
+|  | Intake / start term (Term + Year) | Text input | Required | Contoh "Fall 2026"; dipakai untuk reminder timeline. |
+| **Language Proficiency** | IELTS/TOEFL/DUOLINGO score | Text input | Required (isi "Belum tes" jika belum ada) | Menerima skor + subscore. |
+|  | Score expiry date | Date | Optional | Validasi masa berlaku skor. |
+|  | Planned test date | Date | Conditional (muncul jika skor belum ada) | Membantu scheduling reminder. |
+| **Experience & Achievements** | Work experience relevance | Textarea | Required | Fokus pada pengalaman paling relevan dengan scholarship. |
+|  | Extracurricular / leadership roles | Textarea | Required | Output rewrite leadership. |
+|  | Research / publications | Textarea | Conditional (Master/PhD) | Disembunyikan untuk HS/S1. |
+|  | Volunteering / community involvement | Textarea | Required | Memetakan impact sosial. |
+|  | Additional tests (GRE/GMAT/JLPT/TestDaF) | Text input | Optional | Single line; kumpulkan supporting scores. |
+
+UX Catatan:
+- Field conditional (`Planned test date`, `Research / publications`) memanfaatkan class `.hidden` di `role-form.html` dan handler di `assets/js/main.js`.
+- Scholarship target menampilkan logo (lazy loaded) dan highlight state saat dipilih.
+- Placeholder menggunakan gaya ringkas sesuai screenshot intake. |
+- Semua data dipakai untuk scoring baru: Academic Background, Language Readiness, Experience Impact.
+
+#### 4.2.2 Jobseeker Intake – Portfolio/CV Review
+
+**Alur umum:** Upload CV → Pilih Jobseeker → Form pertanyaan tambahan.
+
+| Group | Field | Type | Status | Notes |
+| --- | --- | --- | --- | --- |
+| **Experience Background** | Current background (education, role, industry) | Textarea | Required | Digunakan untuk kontekstualisasi pengalaman, bagian pertama ringkasan. |
+|  | Target role atau industry | Textarea | Required | Jelaskan role/industri tujuan (entry-level, mid, freelance, remote). |
+|  | Skills & certifications acquired | Textarea | Optional | Kursus, bootcamp, sertifikasi, hard/soft skills. |
+|  | Work experience | Textarea | Required | Tahun pengalaman, relevansi terhadap target role. |
+|  | Career motivation | Textarea | Required | Alasan growth/switch/remote lifestyle/first job. |
+|  | Salary expectation / preferred rate | Text input | Optional | Range gaji atau rate per jam. |
+|  | Availability | Text input | Optional | Full-time, part-time, remote, project-based. |
+| **Additional Document** | Portfolio & related documents | Textarea | Optional | Link Behance, GitHub, deck, atau lampiran lain. |
+| **Additional points for output** | Leadership highlight | Textarea | Optional | Contoh memimpin tim/proyek, mentoring. |
+|  | Communication skill | Textarea | Optional | Presentasi, stakeholder management, negosiasi. |
+|  | Adjustable notes | Textarea | Optional | Hal yang dapat disesuaikan (tools, lokasi, jam kerja). |
+
+UX Catatan:
+- Fokus pada narasi jobseeker: field menampung motivasi, fleksibilitas, dan portfolio untuk bahan output rewrite.
+- Semua field berada dalam satu form grid tanpa pilihan level; memudahkan user berbagai senioritas.
+- Skor baru terdiri dari tiga kategori: Experience Background, Market Readiness, Differentiation (lihat `computeJobseeker()` di `assets/js/main.js`).
 
 ### **4.3 Feature 3: Rewrite & Tailored CV Preview**
 
@@ -152,6 +201,29 @@ As a user, I want to see rewritten suggestions and preview my tailored CV so tha
 
 * Tombol download hanya aktif untuk premium user.  
   ---
+
+#### 4.3.1 Suggested Matches & Profile Summary
+
+**Description:**  
+Memberikan rekomendasi role, industri, ukuran perusahaan, dan target gaji yang selaras dengan profil user; sekaligus menampilkan ringkasan skor dan data profil penting untuk konteks tambahan setelah snapshot analisis.
+
+**Components:**
+
+- Suggested Matches card (`analysis.html#suggestedMatches`) dengan grid 4 kolom: Roles, Industries, Company Sizes, Target Salaries.
+- Scores & Profile card (`analysis.html#profileSummary`) menampilkan metrik Quality, Industry Fit, Experience, Region, Role Focus, Background.
+
+**Behavior:**
+
+- Data dummy diisi via `assets/js/main.js` berdasarkan `role`, `jobLevel`, dan parameter URL (`targetRole`, `targetIndustry`, `experienceLabel`, `targetLocation`).
+- Rating bintang (0–5) dirender menggunakan karakter unicode dan styling `.suggest-item .rating`. Meta tambahan seperti ukuran perusahaan/gaji bersifat opsional.
+- Badge `#profileBadge` menampilkan konteks snapshot (mis. `Professional Snapshot`).
+
+**Acceptance Criteria:**
+
+- Suggested Matches muncul otomatis setelah sub-score di `analysis.html` dengan minimal 3 item per kolom (fallback default tersedia).
+- Scores & Profile card menampilkan semua item dengan fallback teks bila parameter tidak ada.
+- Styling mengikuti brand guideline (card putih, rounded-xl, shadow, Inter font, accent sesuai role).
+- Section tetap responsif (2 kolom pada ≤960px, 1 kolom pada ≤640px).
 
 ### **4.4 Feature 4: Premium Monetization Flow**
 
