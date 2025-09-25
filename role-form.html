@@ -173,25 +173,49 @@
         </div>
       </div>
 
-      <!-- Jobseeker form -->
-      <div class="form-section" data-role="Jobseeker">
-        <div class="section-label">Experience Background</div>
+      <!-- Internship form -->
+      <div class="form-section" data-role="Internship">
+        <div class="section-label">Role Level Preference</div>
         <div class="form-grid">
           <div class="field" style="grid-column: 1 / -1;">
-            <label for="jsCurrentBackground">Current background (education, role, industry)</label>
-            <textarea id="jsCurrentBackground" placeholder="Ceritakan latar belakang pendidikan, role terakhir, dan industri saat ini."></textarea>
+            <label>Pilih level yang kamu targetkan</label>
+            <div class="radio-group" role="radiogroup" aria-label="Internship role level">
+              <label class="radio-pill"><input type="radio" name="internLevel" value="Internship" checked /> Internship</label>
+              <label class="radio-pill"><input type="radio" name="internLevel" value="Entry" /> Entry</label>
+              <label class="radio-pill"><input type="radio" name="internLevel" value="Medior" /> Medior</label>
+              <label class="radio-pill"><input type="radio" name="internLevel" value="Senior" /> Senior</label>
+            </div>
           </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="internLocationOther">Catatan tambahan (opsional)</label>
+            <input id="internLocationOther" type="text" placeholder="Tambahan konteks (misal preferensi lokasi khusus atau timeline)" />
+          </div>
+        </div>
+
+        <div class="section-label">Experience &amp; Portfolio</div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="projects">Project highlight</label>
+            <textarea id="projects" placeholder="Ceritakan proyek atau tugas kuliah paling relevan beserta dampaknya."></textarea>
+          </div>
+          <div class="field">
+            <label for="org">Organisasi / komunitas</label>
+            <textarea id="org" placeholder="Aktivitas organisasi, kepanitiaan, atau komunitas dengan peran kamu."></textarea>
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="coursework">Coursework / sertifikasi</label>
+            <textarea id="coursework" placeholder="Mata kuliah, kursus, atau sertifikasi yang mendukung internship target."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jobseeker form -->
+      <div class="form-section" data-role="Jobseeker">
+        <div class="section-label">Career Goals &amp; Preferences</div>
+        <div class="form-grid">
           <div class="field" style="grid-column: 1 / -1;">
             <label for="jsTargetRole">Target role atau industry</label>
             <textarea id="jsTargetRole" placeholder="Entry-level, mid-level, freelance, remote — jelaskan role atau industri yang dituju."></textarea>
-          </div>
-          <div class="field">
-            <label for="jsSkillsCerts">Skills &amp; certifications acquired</label>
-            <textarea id="jsSkillsCerts" placeholder="Sertifikasi, bootcamp, technical/soft skills yang sudah dimiliki."></textarea>
-          </div>
-          <div class="field">
-            <label for="jsWorkExperience">Work experience</label>
-            <textarea id="jsWorkExperience" placeholder="Total tahun pengalaman dan relevansi terhadap job target."></textarea>
           </div>
           <div class="field">
             <label for="jsMotivation">Career motivation</label>
@@ -201,33 +225,30 @@
             <label for="jsSalaryExpectation">Salary expectation / preferred rate</label>
             <input id="jsSalaryExpectation" type="text" placeholder="contoh: IDR 10–12 jt / bulan atau Rp150k/jam" />
           </div>
-          <div class="field">
-            <label for="jsAvailability">Availability</label>
-            <input id="jsAvailability" type="text" placeholder="Full-time, part-time, project-based, remote" />
-          </div>
         </div>
 
-        <div class="section-label">Work Setup & Region</div>
+        <div class="section-label">Preference &amp; Region</div>
         <div class="form-grid">
-          <div class="field">
-            <label>Preferensi kerja</label>
-            <div class="option-group" role="radiogroup" aria-label="Preferensi kerja">
-              <label class="option-pill"><input type="radio" name="jsWorkMode" value="WFH" checked /> WFH</label>
-              <label class="option-pill"><input type="radio" name="jsWorkMode" value="WFO" /> WFO</label>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>Work mode preference</label>
+            <div class="radio-group" role="radiogroup" aria-label="Preferensi bekerja">
+              <label class="radio-pill"><input type="radio" name="jsWorkMode" value="WFH (Remote)" checked /> WFH (Remote)</label>
+              <label class="radio-pill"><input type="radio" name="jsWorkMode" value="WFO (On-site)" /> WFO (On-site)</label>
+              <label class="radio-pill"><input type="radio" name="jsWorkMode" value="Hybrid" /> Hybrid</label>
             </div>
           </div>
-          <div class="field">
-            <label>Region pilihan</label>
-            <div class="option-group" role="radiogroup" aria-label="Region pilihan">
-              <label class="option-pill"><input type="radio" name="jsRegion" value="Indonesia" checked /> Indonesia</label>
-              <label class="option-pill"><input type="radio" name="jsRegion" value="Malaysia" /> Malaysia</label>
-              <label class="option-pill"><input type="radio" name="jsRegion" value="Singapura" /> Singapura</label>
-              <label class="option-pill"><input type="radio" name="jsRegion" value="Australia" /> Australia</label>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>Preferred region (negara)</label>
+            <div class="radio-group" role="radiogroup" aria-label="Preferensi negara">
+              <label class="radio-pill"><input type="radio" name="jsRegion" value="Indonesia" checked /> Indonesia</label>
+              <label class="radio-pill"><input type="radio" name="jsRegion" value="Malaysia" /> Malaysia</label>
+              <label class="radio-pill"><input type="radio" name="jsRegion" value="Singapura" /> Singapura</label>
+              <label class="radio-pill"><input type="radio" name="jsRegion" value="Australia" /> Australia</label>
             </div>
           </div>
         </div>
 
-        <div class="section-label">Additional Document</div>
+        <div class="section-label">Portfolio &amp; Documents</div>
         <div class="form-grid">
           <div class="field" style="grid-column: 1 / -1;">
             <label for="jsPortfolio">Portfolio &amp; related documents</label>
@@ -235,16 +256,8 @@
           </div>
         </div>
 
-        <div class="section-label">Additional points for output</div>
+        <div class="section-label">Additional notes</div>
         <div class="form-grid">
-          <div class="field">
-            <label for="jsLeadership">Leadership highlight</label>
-            <textarea id="jsLeadership" placeholder="Pengalaman memimpin tim, koordinasi proyek, mentoring."></textarea>
-          </div>
-          <div class="field">
-            <label for="jsCommunication">Communication skill</label>
-            <textarea id="jsCommunication" placeholder="Contoh presentasi, stakeholder management, negosiasi."></textarea>
-          </div>
           <div class="field" style="grid-column: 1 / -1;">
             <label for="jsAdjustable">Adjustable notes</label>
             <textarea id="jsAdjustable" placeholder="Hal-hal yang bisa disesuaikan berdasarkan kebutuhan perusahaan (tools, lokasi, jam kerja)"></textarea>

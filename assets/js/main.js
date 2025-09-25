@@ -149,8 +149,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (roleFocusCopy) roleFocusCopy.textContent = focusMap[r] || 'Jawab pertanyaan sesuai kebutuhan program ini.';
 
       if (roleChip) {
-        roleChip.classList.remove('accent-green', 'accent-blue');
-        const chipAccent = r === 'Scholarship' ? 'accent-green' : r === 'Jobseeker' ? 'accent-blue' : '';
+        roleChip.classList.remove('accent-green', 'accent-blue', 'accent-orange', 'accent-purple');
+        const chipAccentMap = {
+          Scholarship: 'accent-green',
+          Jobseeker: 'accent-blue',
+          'Career Switcher': 'accent-orange',
+          Internship: 'accent-purple'
+        };
+        const chipAccent = chipAccentMap[r];
         if (chipAccent) roleChip.classList.add(chipAccent);
       }
 
@@ -265,20 +271,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function computeJobseeker() {
-      const backgroundLen = textLen('#jsCurrentBackground');
       const targetLen = textLen('#jsTargetRole');
-      const skillsLen = textLen('#jsSkillsCerts');
-      const workLen = textLen('#jsWorkExperience');
       const motivationLen = textLen('#jsMotivation');
-      const leadershipLen = textLen('#jsLeadership');
-      const communicationLen = textLen('#jsCommunication');
       const adjustableLen = textLen('#jsAdjustable');
       const portfolioLen = textLen('#jsPortfolio');
-      const availability = textLen('#jsAvailability');
+      const salaryLen = (qs('#jsSalaryExpectation')?.value || '').trim().length;
+      const workModeLen = (document.querySelector('input[name="jsWorkMode"]:checked')?.value || '').length;
+      const regionLen = (document.querySelector('input[name="jsRegion"]:checked')?.value || '').length;
+      const availability = workModeLen + regionLen;
 
-      const profile = Math.round(scale(clamp(backgroundLen + targetLen + motivationLen, 0, 1500), 0, 1500, 45, 96));
-      const experience = Math.round(scale(clamp(workLen + skillsLen + availability + portfolioLen, 0, 1500), 0, 1500, 44, 94));
-      const polish = Math.round(scale(clamp(leadershipLen + communicationLen + adjustableLen, 0, 1200), 0, 1200, 42, 92));
+      // Profile emphasizes clarity of target and motivation
+      const profile = Math.round(scale(clamp(targetLen + motivationLen, 0, 1500), 0, 1500, 45, 96));
+      // Market readiness emphasizes portfolio visibility, availability preferences, and salary expectation clarity
+      const experience = Math.round(scale(clamp(portfolioLen + availability + salaryLen, 0, 1500), 0, 1500, 44, 94));
+      // Differentiation comes from flexibility/adjustable notes
+      const polish = Math.round(scale(clamp(adjustableLen, 0, 1200), 0, 1200, 42, 92));
 
       return {
         labels: ['Experience Background', 'Market Readiness', 'Differentiation'],
@@ -329,15 +336,19 @@ document.addEventListener('DOMContentLoaded', () => {
       q.set('l1', labels[0]); q.set('l2', labels[1]); q.set('l3', labels[2]);
       if (active === 'Jobseeker') {
         const targetRole = (qs('#jsTargetRole')?.value || '').trim();
-        const background = (qs('#jsCurrentBackground')?.value || '').trim();
-        const location = (qs('#jsAvailability')?.value || '').trim();
-        const industry = (qs('#jsSkillsCerts')?.value || '').trim();
+        const workMode = (document.querySelector('input[name="jsWorkMode"]:checked')?.value || '').trim();
+        const region = (document.querySelector('input[name="jsRegion"]:checked')?.value || '').trim();
         const motivation = (qs('#jsMotivation')?.value || '').trim();
         if (targetRole) q.set('targetRole', targetRole);
-        if (industry) q.set('targetIndustry', industry);
-        if (location) q.set('targetLocation', location);
-        if (background) q.set('experienceLabel', background.split('\n')[0].slice(0, 60));
+        if (region) q.set('targetLocation', region);
         if (motivation) q.set('motivation', motivation);
+        if (workMode) q.set('workMode', workMode);
+      }
+      if (active === 'Internship') {
+        const level = (document.querySelector('input[name="internLevel"]:checked')?.value || '').trim();
+        const notes = (qs('#internLocationOther')?.value || '').trim();
+        if (level) q.set('targetRoleLevel', level);
+        if (notes) q.set('notes', notes);
       }
       if (active === 'Scholarship') {
         const field = (qs('#intendedField')?.value || '').trim();
@@ -348,36 +359,119 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = `analysis.html?${q.toString()}`;
     });
 
-    const closeLock = qs('#closeLock');
+  }
 
-    // Update score circle
-    scoreCircle.style.setProperty('--score', String(score));
-    valueEl.innerHTML = `${score}<small>/100</small>`;
-    roleEl.textContent = jobLevel ? `${role} – ${jobLevel}` : role;
+  // Analysis page logic
+  if (isAnalysis) {
+    const params = new URLSearchParams(window.location.search);
+    const role = params.get('role') || 'Scholarship';
 
-    // Position dot along the curve: map 0..100 -> 5%..95%
-    const pct = 5 + (score / 100) * 90;
-    dot.style.left = pct + '%';
+    // Score and header
+    const score = Math.max(0, Math.min(100, parseInt(params.get('score') || '65', 10)));
+    const scoreValueEl = document.getElementById('scoreValue');
+    if (scoreValueEl) scoreValueEl.innerHTML = `${score}<small>/100</small>`;
+
+    const dotEl = document.getElementById('curveDot');
+    if (dotEl) {
+      const pct = 5 + (score / 100) * 90;
+      dotEl.style.left = pct + '%';
+    }
+
+    const roleLabelEl = document.getElementById('roleLabel');
+    if (roleLabelEl) roleLabelEl.textContent = role;
+
+    // Rebuild highlights with concise points and dynamic red flags
+    const highlights = document.querySelector('.highlights');
+    if (highlights) {
+      highlights.innerHTML = '';
+      const add = (text, type = 'success') => {
+        const el = document.createElement('div');
+        el.className = 'highlight-item';
+        const ico = document.createElement('div');
+        ico.className = 'ico ' + (type === 'warn' ? 'warn' : 'success');
+        ico.textContent = type === 'warn' ? '⚠️' : '✔️';
+        const txt = document.createTextNode(' ' + text);
+        el.appendChild(ico);
+        el.appendChild(txt);
+        highlights.appendChild(el);
+      };
+
+      if (role === 'Scholarship') {
+        // Positive cues
+        add('Gunakan Academic CV format: Education • Research • Leadership/Community • Awards • Publications', 'success');
+        add('Selaraskan isi CV dengan field/scholarship target (prestasi & impact terlihat)', 'success');
+
+        // Dynamic Red Flags (URL-driven)
+        const ieltsScore = parseFloat(params.get('ieltsScore'));
+        const ieltsMin = parseFloat(params.get('ieltsMin') || '6.5');
+        if (!Number.isNaN(ieltsScore) && !Number.isNaN(ieltsMin) && ieltsScore < ieltsMin) {
+          add(`IELTS di bawah minimum (${ieltsScore} < ${ieltsMin})`, 'warn');
+        }
+
+        const now = new Date();
+        const expStr = params.get('ieltsExpiry'); // expiry date
+        const takenStr = params.get('ieltsDate');  // test date
+        if (expStr) {
+          const exp = new Date(expStr);
+          if (!Number.isNaN(exp.getTime()) && exp < now) add('IELTS expired', 'warn');
+        } else if (takenStr) {
+          const taken = new Date(takenStr);
+          if (!Number.isNaN(taken.getTime())) {
+            const diffDays = (now - taken) / (1000 * 60 * 60 * 24);
+            if (diffDays > 730) add('IELTS expired (>2 tahun)', 'warn');
+          }
+        }
+
+        const gpa = parseFloat(params.get('gpa'));
+        const scale = parseFloat(params.get('gpaScale') || '4');
+        const gpaAvg = parseFloat(params.get('gpaAvg') || '3.2');
+        if (!Number.isNaN(gpa) && !Number.isNaN(scale) && scale > 0 && !Number.isNaN(gpaAvg)) {
+          const normalized = (gpa / scale) * 4;
+          if (normalized < gpaAvg) add(`GPA di bawah rata-rata target (${normalized.toFixed(2)}/4 < ${gpaAvg}/4)`, 'warn');
+        }
+      } else {
+        // Non-scholarship concise positives
+        add('Format CV rapi dan ringkas', 'success');
+        add('Tambahkan keyword relevan dengan role/industry', 'success');
+      }
+    }
 
     // Sub-scores
     const defaults = {
-      Scholarship: { labels: ['Academic Strength', 'Leadership', 'Research Fit'] },
-      Jobseeker: { labels: ['Experience Background', 'Market Readiness', 'Differentiation'] },
-      'Career Switcher': { labels: ['Transferable Skills', 'Role Relevansi', 'Narrative'] },
-      Internship: { labels: ['Project Fit', 'Organization/Activity', 'Growth Potential'] },
+      Scholarship: ['Academic Strength', 'Leadership', 'Research Fit'],
+      Jobseeker: ['Experience Background', 'Market Readiness', 'Differentiation'],
+      'Career Switcher': ['Transferable Skills', 'Role Relevansi', 'Narrative'],
+      Internship: ['Project Fit', 'Organization/Activity', 'Growth Potential'],
     };
-    const scores = [
-      Math.max(0, Math.min(100, parseInt(params.get('s1') || '68', 10))),
-      Math.max(0, Math.min(100, parseInt(params.get('s2') || '64', 10))),
-      Math.max(0, Math.min(100, parseInt(params.get('s3') || '62', 10))),
-    ];
     const labels = [
-      params.get('l1') || (defaults[role]?.labels?.[0] || 'Sub-score 1'),
-      params.get('l2') || (defaults[role]?.labels?.[1] || 'Sub-score 2'),
-      params.get('l3') || (defaults[role]?.labels?.[2] || 'Sub-score 3'),
+      params.get('l1') || (defaults[role]?.[0] || 'Sub-score 1'),
+      params.get('l2') || (defaults[role]?.[1] || 'Sub-score 2'),
+      params.get('l3') || (defaults[role]?.[2] || 'Sub-score 3'),
     ];
+    const s1 = Math.max(0, Math.min(100, parseInt(params.get('s1') || '68', 10)));
+    const s2 = Math.max(0, Math.min(100, parseInt(params.get('s2') || '64', 10)));
+    const s3 = Math.max(0, Math.min(100, parseInt(params.get('s3') || '62', 10)));
 
-    // Accent class
+    const bar1LabelEl = document.getElementById('bar1Label');
+    const bar2LabelEl = document.getElementById('bar2Label');
+    const bar3LabelEl = document.getElementById('bar3Label');
+    const bar1ValEl = document.getElementById('bar1Value');
+    const bar2ValEl = document.getElementById('bar2Value');
+    const bar3ValEl = document.getElementById('bar3Value');
+    const bar1FillEl = document.getElementById('bar1Fill');
+    const bar2FillEl = document.getElementById('bar2Fill');
+    const bar3FillEl = document.getElementById('bar3Fill');
+
+    if (bar1LabelEl) bar1LabelEl.textContent = labels[0];
+    if (bar2LabelEl) bar2LabelEl.textContent = labels[1];
+    if (bar3LabelEl) bar3LabelEl.textContent = labels[2];
+    if (bar1ValEl) bar1ValEl.textContent = s1 + '/100';
+    if (bar2ValEl) bar2ValEl.textContent = s2 + '/100';
+    if (bar3ValEl) bar3ValEl.textContent = s3 + '/100';
+    if (bar1FillEl) bar1FillEl.style.width = s1 + '%';
+    if (bar2FillEl) bar2FillEl.style.width = s2 + '%';
+    if (bar3FillEl) bar3FillEl.style.width = s3 + '%';
+
     const accentMap = {
       Scholarship: 'accent-green',
       Jobseeker: 'accent-blue',
@@ -385,126 +479,138 @@ document.addEventListener('DOMContentLoaded', () => {
       Internship: 'accent-purple',
     };
     const accent = accentMap[role] || '';
-    [bar1Fill, bar2Fill, bar3Fill].forEach(el => {
+    [bar1FillEl, bar2FillEl, bar3FillEl].forEach(el => {
       el?.classList.remove('accent-green', 'accent-orange', 'accent-purple', 'accent-blue');
       if (accent && el) el.classList.add(accent);
     });
 
-    // Set labels and widths
-    if (bar1Label) bar1Label.textContent = labels[0];
-    if (backgroundEl && role !== 'Scholarship') {
-      backgroundEl.textContent = role === 'Jobseeker' ? (params.get('motivation') || 'Jobseeker background') : 'General profile';
-    }
+    const badgeEl = document.getElementById('profileBadge');
     if (badgeEl) badgeEl.textContent = `${role} Snapshot`;
-    if (bar1Val) bar1Val.textContent = scores[0] + '/100';
-    if (bar2Val) bar2Val.textContent = scores[1] + '/100';
-    if (bar3Val) bar3Val.textContent = scores[2] + '/100';
-    if (bar1Fill) bar1Fill.style.width = scores[0] + '%';
-    if (bar2Fill) bar2Fill.style.width = scores[1] + '%';
-    if (bar3Fill) bar3Fill.style.width = scores[2] + '%';
 
-    // Sprint 3: Rewrite suggestions (one free sample, others locked)
-    if (rewriteList) {
-      rewriteList.innerHTML = '';
-      /** @type {{title:string, original:string, rewritten:string}[]} */
-      let items = [];
-      if (role === 'Scholarship') {
-        items = [
-          {
-            title: 'Academic Achievement — bullet rewrite',
-            original: 'Menjadi penerima beasiswa internal kampus, aktif di kegiatan akademik.',
-            rewritten: 'Awarded competitive campus scholarship; maintained strong academic standing while contributing to research/club activities with measurable outcomes.'
-          },
-          {
-            title: 'Leadership/Organization — bullet rewrite',
-            original: 'Ketua organisasi mahasiswa, memimpin beberapa program kerja.',
-            rewritten: 'Led 15+ member student organization to deliver 4 campus-wide programs, increasing participant satisfaction by 20% and fundraising Rp15 juta.'
-          },
-          {
-            title: 'Short Objective — scholarship',
-            original: 'Ingin melanjutkan studi dengan beasiswa.',
-            rewritten: 'Motivated scholar with strong academic foundation (STEM) seeking scholarship to deepen research in [field], aiming to deliver societal impact via [topic] with faculty collaboration.'
-          },
-        ];
-      } else if (role === 'Career Switcher') {
-        items = [
-          {
-            title: 'Transferable Skills — bullet rewrite',
-            original: 'Berpengalaman di peran sebelumnya, ingin beralih karier.',
-            rewritten: 'Translated cross-functional experience into data-driven decisions; improved process efficiency by 18% using spreadsheets, dashboards, and stakeholder alignment.'
-          },
-          {
-            title: 'New Role Target — summary',
-            original: 'Ingin menjadi Product Manager.',
-            rewritten: 'Aspiring Product Manager with analytics, UX sense, and delivery track-record; able to scope MVPs, prioritize roadmap, and align teams to outcomes.'
-          },
-          {
-            title: 'Suggested Project/Portfolio — bullet',
-            original: 'Sedang menyiapkan portofolio.',
-            rewritten: 'Built a public case study: redesigned onboarding flow, defined success metrics (activation rate), and delivered prototype validated by 5 user interviews.'
-          },
-        ];
-      } else if (role === 'Jobseeker') {
-        items = [
-          {
-            title: 'Jobseeker Summary — rewrite',
-            original: 'Profesional dengan pengalaman relevan ingin mengejar peran baru.',
-            rewritten: `Strategic professional targeting ${params.get('l1') || 'role baru'}; menghubungkan pengalaman saat ini dengan kebutuhan bisnis dan menunjukkan kesiapan untuk kontribusi instan.`
-          },
-          {
-            title: 'Jobseeker Experience Highlight',
-            original: 'Mengelola beberapa proyek dan tim kecil.',
-            rewritten: 'Led cross-functional squad to deliver campaign impacting revenue +15%, mentored junior members, dan membangun SOP untuk scale-up.'
-          },
-          {
-            title: 'Jobseeker Growth Plan',
-            original: 'Sedang mengikuti pelatihan untuk upgrade skill.',
-            rewritten: 'Mapped 90-day upskilling plan: advanced certification, peer mentoring, dan pilot project yang menunjukkan kesiapan memasuki domain baru.'
-          },
-        ];
-      } else { // Internship
-        items = [
-          {
-            title: 'Project — bullet rewrite (impact-oriented)',
-            original: 'Mengerjakan proyek tugas kuliah terkait web.',
-            rewritten: 'Developed responsive web app for course project; implemented authentication and REST API integration, achieving 95% Lighthouse performance score.'
-          },
-          {
-            title: 'Organization/Volunteer — bullet rewrite',
-            original: 'Aktif di organisasi kampus.',
-            rewritten: 'Coordinated volunteer team of 10 to deliver campus event (300+ attendees), managing logistics, sponsors, and post-event reporting.'
-          },
-          {
-            title: '1-page Summary — internship',
-            original: 'Ingin magang untuk menambah pengalaman.',
-            rewritten: 'STEM undergraduate with hands-on projects and strong willingness to learn; ready to contribute on real tasks, iterate on feedback, and grow with the team.'
-          },
-        ];
-      }
+    // Toggle Scholarship Lens section visibility
+    const lensSection = document.getElementById('scholarshipLens');
+    if (lensSection) lensSection.style.display = role === 'Scholarship' ? '' : 'none';
 
-      items.forEach((it, idx) => {
-        const locked = idx > 0; // first free, others locked
-        const el = document.createElement('div');
-        el.className = 'rewrite-item' + (locked ? ' locked' : '');
-        el.innerHTML = `
-          <div class="rewrite-title">${it.title}</div>
-          <div class="rewrite-body">
-            <div class="original"><div class="label">Original</div><div>${it.original}</div></div>
-            <div class="rewritten"><div class="label">Rewritten</div><div>${it.rewritten}</div></div>
-          </div>
-          ${locked ? '<div class="lock-overlay"><span class="lock-icon">🔒 Terkunci</span></div>' : ''}
-        `;
-        rewriteList.appendChild(el);
+    // Scholarship Lens — concise academic CV checklist
+    const schChecklist = document.getElementById('schChecklist');
+    if (schChecklist && role === 'Scholarship') {
+      const items = [
+        'Academic CV format (not corporate). Sections: Education • Research • Leadership/Community • Awards • Publications.',
+        'Proper structure: clean/ATS-friendly, avoid heavy design.',
+        'Language: formal academic tone, consistent formatting, clear action verbs.',
+        'Scholarship relevance: Education kuat; leadership/community disorot; capaian terukur; align dengan field.',
+        'Red flags to check: IELTS expired/low; GPA di bawah rata-rata; CV terlalu job-style; referees tidak ada.',
+        'Visual consistency & neatness: font/margin/heading seragam; bullet alignment; section balance; tidak terlalu padat atau kosong.',
+        'Document hygiene: perbaiki typo; filename "CV_Scholarship_Name_2025.pdf"; PDF rapi (<2MB, tidak blur).',
+        'Links & contacts: Google Scholar/ResearchGate/LinkedIn aktif; email profesional; link publikasi/portfolio valid.',
+        '6-second impression: bidang studi, topik riset, prestasi utama langsung terlihat.',
+        'Screening lens: hindari tone terlalu career-oriented; jelaskan gap studi; tekankan academic/leadership impact.',
+        'Academic branding: konsisten dengan profil LinkedIn/Scholar; gunakan kata kerja akademik (researched, published, presented); hasil terlihat jelas.'
+      ];
+      schChecklist.innerHTML = '';
+      items.forEach((txt) => {
+        const li = document.createElement('li');
+        li.className = 'suggest-item';
+        const name = document.createElement('div');
+        name.className = 'name';
+        name.textContent = txt;
+        li.appendChild(name);
+        schChecklist.appendChild(li);
       });
     }
 
-    // Sprint 3: Preview CV content
+    // Optional: region/background quick fill
+    const region = params.get('targetLocation');
+    const regionLabelEl = document.getElementById('regionLabel');
+    if (region && regionLabelEl) regionLabelEl.textContent = region;
+    const motivation = params.get('motivation');
+    const backgroundEl = document.getElementById('backgroundLabel');
+    if (role === 'Jobseeker' && motivation && backgroundEl) {
+      backgroundEl.textContent = motivation.slice(0, 60);
+    }
+
+    // Academic CV (ATS) Draft — show only for Scholarship
+    const cvDraft = document.getElementById('academicCvDraft');
+    if (cvDraft) cvDraft.style.display = role === 'Scholarship' ? '' : 'none';
+
+    if (role === 'Scholarship' && cvDraft) {
+      const academicSummary = document.getElementById('academicSummary');
+      const eduList = document.getElementById('academicEducation');
+      const resList = document.getElementById('academicResearch');
+      const pubList = document.getElementById('academicPublications');
+      const presList = document.getElementById('academicPresentations');
+      const awdList = document.getElementById('academicAwards');
+      const leadList = document.getElementById('academicLeadership');
+      const sklList = document.getElementById('academicSkills');
+      const refList = document.getElementById('academicReferences');
+
+      const targetField = params.get('targetField') || params.get('field') || 'your focus area';
+      const gpa = params.get('gpa');
+      const gpaScale = params.get('gpaScale') || '4.00';
+
+      if (academicSummary) {
+        const gpaSnippet = gpa ? ` (GPA ${parseFloat(gpa).toFixed(2)}/${gpaScale})` : '';
+        academicSummary.textContent = `Early-career researcher focusing on ${targetField}. Experienced in quantitative/qualitative methods and academic writing${gpaSnippet}. Aiming to leverage a scholarship to deepen research and deliver measurable impact in ${targetField}.`;
+      }
+
+      const fill = (ul, items) => {
+        if (!ul) return;
+        ul.innerHTML = '';
+        items.forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+      };
+
+      fill(eduList, [
+        'Your University — Program Studi [Tahun lulus]; highlight: GPA / penghargaan (isi).',
+        'Tugas akhir/tesis: sebutkan judul singkat, metode utama, ukuran sampel, dan hasil kunci (angka).'
+      ]);
+
+      fill(resList, [
+        'Researched [topik] menggunakan [metode/tools: Python/R/SPSS/SQL]; menganalisis n=[N] data; hasil: [metrik, mis. akurasi +x%].',
+        'Designed survey/eksperimen (hypothesis testing); validasi instrumen (Cronbach’s α=[x.xx]); uji statistik (t-test/ANOVA/regresi).',
+        'Collaborated dengan PI/dosen/asisten; menyusun manuskrip dan submitted ke [konferensi/jurnal].'
+      ]);
+
+      fill(pubList, [
+        '[Nama Anda], [Rekan]. (Tahun). "[Judul]". [Jurnal/Prosiding]. DOI/Link.',
+        'Working paper: "[Judul]", under review at [Konferensi/Jurnal].'
+      ]);
+
+      fill(presList, [
+        '[Judul Presentasi], [Konferensi/Seminar], [Kota, Tahun].',
+        'Poster: [Judul], [Event], [Tahun].'
+      ]);
+
+      fill(awdList, [
+        '[Nama Beasiswa/Penghargaan], [Penyelenggara], [Tahun].',
+        '[Sertifikasi: IELTS x.x (YYYY), TOEFL iBT xxx, dsb.]'
+      ]);
+
+      fill(leadList, [
+        'Led [N] anggota untuk program [nama]; hasil: [impact terukur: +x%, Rp x], publikasi internal/eksternal.',
+        'Mentored [N] mahasiswa pada [topik]; menyusun modul materi dan evaluasi.'
+      ]);
+
+      fill(sklList, [
+        'Tools: Python (pandas, scikit-learn), R (tidyverse), SPSS, SQL, Tableau/Power BI, Excel Advanced.',
+        'Methods: literature review, survey design, data modeling, hypothesis testing, A/B testing, causal inference (DID/PSM), NLP dasar.',
+        'Academic: academic writing, publishing workflow, conference presentation, citation management (Zotero/Mendeley).'
+      ]);
+
+      fill(refList, [
+        '[Nama, Gelar] — [Jabatan, Institusi] — [email] (opsional).'
+      ]);
+    }
+
+    // Preview card population
+    const previewCard = document.getElementById('previewCard');
+    const previewSummary = document.getElementById('previewSummary');
+    const previewProjects = document.getElementById('previewProjects');
+    const previewSkills = document.getElementById('previewSkills');
     if (previewCard) {
-      // Set accent class
       previewCard.classList.remove('accent-green', 'accent-orange', 'accent-purple', 'accent-blue');
       if (accent) previewCard.classList.add(accent);
 
-      // Populate simple preview content per role
+      const targetRole = params.get('targetRole');
       const previewData = {
         Scholarship: {
           summary: 'Scholarship-focused candidate with solid academics and consistent leadership impact. Interested in research on [topic] with community contribution.',
@@ -515,7 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
           skills: 'Academic Writing • Research Methods • Data Analysis • Leadership'
         },
         Jobseeker: {
-          summary: `Strategic professional targeting ${params.get('targetRole') || 'role baru'}; menonjolkan pengalaman, skill, dan motivasi yang siap dijual ke perusahaan target.`,
+          summary: `Strategic professional targeting ${targetRole || 'role baru'}; menonjolkan pengalaman, skill, dan motivasi yang siap dijual ke perusahaan target.`,
           projects: [
             'Key accomplishment: delivered measurable impact (e.g., +18% revenue, -25% churn) dengan kolaborasi lintas tim.',
             'Growth plan: 90-day roadmap (sertifikasi, mentoring, project sampel) untuk mempercepat adaptasi di role baru.'
@@ -540,43 +646,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       };
       const entry = previewData[role] || previewData.Scholarship;
-      const data = typeof entry === 'function' ? entry() : entry;
-      if (previewSummary) previewSummary.textContent = data.summary;
-      if (previewSkills) previewSkills.textContent = data.skills;
-      if (previewProjects) {
+      if (previewSummary) previewSummary.textContent = entry.summary;
+      if (previewSkills) previewSkills.textContent = entry.skills;
+      if (previewProjects && Array.isArray(entry.projects)) {
         previewProjects.innerHTML = '';
-        data.projects.forEach(p => {
+        entry.projects.forEach(p => {
           const li = document.createElement('li');
           li.textContent = p;
           previewProjects.appendChild(li);
         });
       }
-      // downloadBtn handler will be attached later after unlock state check
     }
 
-    // CTA
-    const unlockBtn = qs('#unlockBtn');
-    const openLock = () => lockModal?.classList.add('show');
-    const closeLockFn = () => lockModal?.classList.remove('show');
-    unlockBtn?.addEventListener('click', (e) => {
-      e.preventDefault();
-      openLock();
-    });
-    closeLock?.addEventListener('click', closeLockFn);
-    stayFree?.addEventListener('click', closeLockFn);
-    goToPayment?.addEventListener('click', () => {
-      window.location.href = 'payment.html';
-    });
+    // Premium gating & lock modal
+    const unlockBtn = document.getElementById('unlockBtn');
+    const lockModal = document.getElementById('lockModal');
+    const closeLock = document.getElementById('closeLock');
+    const stayFree = document.getElementById('stayFree');
+    const goToPayment = document.getElementById('goToPayment');
+    const downloadBtn = document.getElementById('downloadBtn');
 
-    // Premium unlocked state
     const unlocked = localStorage.getItem('premiumUnlocked') === '1' || params.get('unlocked') === '1';
     if (unlocked) {
-      // enable download
       if (downloadBtn) downloadBtn.disabled = false;
-      // remove lock overlays and watermark
       document.querySelectorAll('.lock-overlay').forEach(el => el.remove());
       document.querySelectorAll('.preview-watermark').forEach(el => el.remove());
-      // adjust premium box title text if exists
       const premiumTitle = document.querySelector('.premium-box .title');
       if (premiumTitle) premiumTitle.textContent = 'Premium Aktif – Akses Penuh Terbuka';
       if (unlockBtn) {
@@ -586,22 +680,26 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Attach download behavior based on lock state
+    unlockBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      lockModal?.classList.add('show');
+    });
+    closeLock?.addEventListener('click', () => lockModal?.classList.remove('show'));
+    stayFree?.addEventListener('click', () => lockModal?.classList.remove('show'));
+    goToPayment?.addEventListener('click', () => { window.location.href = 'payment.html'; });
+
     if (downloadBtn) {
       downloadBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        // Simulate payment success
         localStorage.setItem('premiumUnlocked', '1');
         window.location.href = 'payment-success.html';
       });
     }
-
   }
 
   // Payment success page logic
   if (isSuccess) {
     const goAnalysis = document.getElementById('goAnalysis');
-    const goDownload = document.getElementById('goDownload');
     goAnalysis?.addEventListener('click', () => {
       window.location.href = 'analysis.html?unlocked=1';
     });
